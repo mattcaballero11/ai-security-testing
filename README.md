@@ -29,7 +29,7 @@ All lab demonstrations were conducted in controlled environments against systems
 This repo is being built in stages. Sections marked live are ready to read. Sections marked in progress are scaffolded but not filled in yet.
 
 - [ ] Methodology (in progress)
-- [ ] Vulnerability taxonomy (in progress, prompt injection live)
+- [ ] Vulnerability taxonomy (in progress, jailbreaking live)
 - [ ] Lab demonstrations (in progress)
 - [ ] Framework mappings (in progress)
 
