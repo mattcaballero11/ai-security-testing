@@ -22,6 +22,8 @@ Test persona stability. How far can you push the model off its configured person
 
 **Deliverable from this phase.** Extracted system prompt (full or reconstructed), behavioral boundary map with hard/soft classification, persona stability assessment. This becomes the reference document for every subsequent phase.
 
+This is the phase [P1-03](../scenarios/P1-03-hidden-context-disclosure/) demonstrates in Project 1, once that scenario is built.
+
 ## Phase 2: Tool and capability testing
 
 **What you're doing.** Validating the tool inventory from recon and testing each tool's boundaries, permissions, and failure modes. This phase establishes what the system can actually do, which determines the maximum blast radius if the model is compromised in later phases.
@@ -43,6 +45,8 @@ Test tool interaction and chaining. Call two tools in sequence. Can the output o
 Test human-in-the-loop controls. For tools with confirmation steps, verify whether the confirmation is enforced in code or just requested in the system prompt. Ask the model to skip confirmation. Tell the model the user already confirmed. Frame the request as urgent. If the confirmation can be bypassed through prompt manipulation, that's a finding: the control is cosmetic, not real.
 
 **Deliverable from this phase.** Validated tool inventory with actual permissions and boundaries documented, tool chain map showing which combinations of tools create risk, excessive agency findings for each over-permissioned or unnecessary tool, human-in-the-loop control assessment.
+
+Project 1 has no tools, so this phase is not demonstrated here. It belongs to Project 3.
 
 ## Phase 3: Prompt injection and jailbreaking
 
@@ -76,6 +80,8 @@ In agent contexts, always chain a successful jailbreak to a tool call. "I got th
 
 **Deliverable from this phase.** Catalog of successful injection and jailbreak techniques with reproduction steps and success rates, chained exploitation paths showing injection-to-action sequences, guardrail bypass findings for any safety classifiers in the pipeline.
 
+[P1-01](../scenarios/P1-01-direct-injection/) and [P1-02](../scenarios/P1-02-jailbreak/) demonstrate the direct-injection and jailbreak halves of this phase in Project 1, once built. The indirect-injection half is out of scope for Project 1 and belongs to Project 2.
+
 ## Phase 4: Attack chain construction
 
 **What you're doing.** Combining findings from Phases 1 through 3 into complete attack chains that demonstrate real-world impact. This is the phase that turns individual findings into the narrative the report will tell.
@@ -98,6 +104,8 @@ In agent contexts, always chain a successful jailbreak to a tool call. "I got th
 
 **Deliverable from this phase.** Complete attack chain documentation with step-by-step reproduction, impact assessment for each chain, reliability measurements. These chains become the core findings of the report.
 
+Project 1 has no tools to chain into, so this phase is not demonstrated here. It belongs to Project 3.
+
 ## Phase 5: Model-specific testing
 
 **What you're doing.** Testing vulnerability classes that don't fit neatly into the injection-and-chaining framework: model extraction, adversarial inputs against the model itself, training data extraction, and any other model-specific risks identified during threat modeling.
@@ -115,6 +123,8 @@ In agent contexts, always chain a successful jailbreak to a tool call. "I got th
 **Output format manipulation.** Test whether the model can be made to produce outputs in unexpected formats that the application handles unsafely. This bridges prompt injection and insecure output handling: the injection is the technique, the output format change is the mechanism, and the downstream system's failure to handle it is the vulnerability.
 
 **Deliverable from this phase.** Model extraction risk assessment, adversarial robustness findings for any ML classifiers in the pipeline, training data memorization findings, output format manipulation findings.
+
+The extraction and adversarial-input testing described in this phase are not demonstrated anywhere in this portfolio. See [references/out-of-scope-ai-ml-risks.md](../references/out-of-scope-ai-ml-risks.md) for why.
 
 ## How to handle time pressure
 
@@ -134,6 +144,6 @@ Scope cuts should be documented in the report. A finding you didn't test for is 
 
 ## Framework references
 
-- OWASP Top 10 for LLM Applications: the testing phases map to the Top 10 categories. Phases 1 and 3 cover LLM01 (Prompt Injection) and LLM07 (System Prompt Leakage). Phase 2 covers LLM06 (Excessive Agency). Phase 4 covers the intersection of multiple categories through chaining. Phase 5 covers LLM10 (Model Theft) and portions of LLM05 (Improper Output Handling).
+- OWASP Top 10 for LLM Applications: the testing phases map to the Top 10 categories. Phases 1 and 3 cover LLM01 (Prompt Injection) and LLM08 (Hidden Context Exposure, which subsumes what the 2025 list called System Prompt Leakage). Phase 2 covers LLM03 (Excessive Agency). Phase 4 covers the intersection of multiple categories through chaining. Phase 5 covers extraction and adversarial-robustness risk that the 2023 list named LLM10 Model Theft; that dedicated category doesn't exist in the 2026 list, so this phase now maps loosely to LLM06 (Unbounded Consumption) for extraction via high query volume, and to portions of LLM10 (Improper Output Handling, renumbered from 2025's LLM05) for the output-format-manipulation testing described above.
 - MITRE ATLAS: the phase structure loosely follows the ATLAS tactic chain from Reconnaissance through Impact, adapted for AI-specific techniques.
 - NIST AI Risk Management Framework: the MEASURE function's emphasis on systematic evaluation aligns with the structured testing approach described here.

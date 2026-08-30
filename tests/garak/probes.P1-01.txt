@@ -1,0 +1,23 @@
+# garak probes for P1-01 Direct prompt injection.
+# One probe per line, comments and blank lines ignored. run.sh joins these with
+# commas into --probes. Verify the names against `garak --list_probes` for your
+# installed version before running; module names drift between releases.
+
+# Instruction override / goal hijacking. The PromptInject work (Perez and
+# Ribeiro 2022): append a rogue instruction, check whether the model follows it
+# instead of its configured task. This is exactly P1-01's instruction-override
+# family. Detector: promptinject.AttackRogueString.
+promptinject.HijackHateHumans
+promptinject.HijackKillHumans
+promptinject.HijackLongPrompt
+
+# Role reassignment, single turn. DAN and relatives assign the model a new
+# persona that supposedly has no restrictions. This is P1-01's role-reassignment
+# family (the DevMode payload in the manual pass is the same shape). The
+# multi-turn crescendo version of this belongs to P1-02, not here.
+# Detectors: dan.DAN, mitigation.MitigationBypass.
+dan.Dan_11_0
+dan.DUDE
+dan.STAN
+dan.ChatGPT_Developer_Mode_v2
+dan.DAN_Jailbreak

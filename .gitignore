@@ -1,0 +1,29 @@
+# Secrets and runtime state
+.env
+logs/
+
+# Local working material, kept off the published repo by choice (2026-08-30).
+.notes/
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Tool caches and run output
+node_modules/
+.promptfoo/
+promptfoo-errors.log
+.giskard/
+garak_runs/
+tests/garak/garak_runs/
+*.report.html
+*.report.jsonl
+
+# OS
+.DS_Store

@@ -94,7 +94,7 @@ Two calibration traps to avoid.
 
 **Model versioning.** Models get updated. A finding confirmed against GPT-4o-2024-05-13 may or may not reproduce against a later version. Note the model version in every finding. Recommend the client re-test after model updates. This is a genuinely new reporting consideration that doesn't exist in traditional pentesting.
 
-**System prompt as both finding and context.** A leaked system prompt is often both a finding on its own (LLM07, information disclosure) and evidence supporting other findings (the prompt reveals tool configurations that explain why excessive agency exists). Reference the prompt in both places. Don't make the reader hunt for it.
+**System prompt as both finding and context.** A leaked system prompt is often both a finding on its own (LLM08 Hidden Context Exposure, or LLM02 Sensitive Information Disclosure if it contains sensitive data) and evidence supporting other findings (the prompt reveals tool configurations that explain why excessive agency exists). Reference the prompt in both places. Don't make the reader hunt for it.
 
 **Chain findings vs component findings.** Some findings are individual weaknesses. Some are chains of individually acceptable components that become dangerous in combination. Report both, but make the chain findings prominent because they demonstrate the real-world attack path and they're the findings the client will act on fastest.
 
