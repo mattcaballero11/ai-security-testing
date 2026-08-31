@@ -125,6 +125,12 @@ class Settings:
         return self.is_hardened
 
     @property
+    def screen_restricted_output(self) -> bool:
+        # P1-02 hardened control: reject a response that walks through the
+        # restricted process at the output stage and return the refusal instead.
+        return self.is_hardened
+
+    @property
     def escape_render_output(self) -> bool:
         return self.is_hardened
 

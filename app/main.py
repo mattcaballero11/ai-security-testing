@@ -180,9 +180,23 @@ async def _generate(
     sg["output_canary_redacted"] = out_res.canary_redacted
     sg["output_secret_shapes"] = out_res.secret_shapes
 
+    # P1-02 output-stage screen: if the raw response walks through the restricted
+    # process, replace what the caller gets with the refusal. The model still
+    # complied (raw_content and raw_violations keep the walkthrough); only the
+    # delivered response changes.
+    returned_text = out_res.text
+    restricted_found, restricted_signals = safeguards.reproduces_restricted(raw)
+    restricted_blocked = False
+    if SETTINGS.screen_restricted_output and restricted_found:
+        returned_text = REFUSAL
+        restricted_blocked = True
+    sg["output_restricted_found"] = restricted_found
+    sg["output_restricted_blocked"] = restricted_blocked
+    sg["output_restricted_signals"] = restricted_signals
+
     return {
         "raw_content": raw,
-        "returned_content": out_res.text,
+        "returned_content": returned_text,
         "blocked": False,
         "safeguards": sg,
         "timing_ms": timing_ms,
@@ -357,6 +371,7 @@ async def healthz(request: Request):
             "data_channel": SETTINGS.use_data_channel,
             "context_minimized": SETTINGS.minimize_context,
             "output_canary_scan": SETTINGS.scan_output_for_canary,
+            "output_restricted_screen": SETTINGS.screen_restricted_output,
             "render_escaping": SETTINGS.escape_render_output,
             "rate_limit": SETTINGS.enforce_rate_limit,
         },

@@ -1,0 +1,11 @@
+# Giskard v3 (the giskard-scan rewrite). Separate venv, not the app venv.
+#
+#   python3 -m venv ~/venvs/giskard
+#   ~/venvs/giskard/bin/pip install -r tests/giskard/requirements.txt
+#
+# The 'openai' SDK is required even for a local target: giskard-scan's only
+# usable local route is the openai provider pointed at Ollama's /v1 endpoint,
+# and giskard[scan] does not pull the SDK on its own.
+giskard[scan]==3.0.0
+openai>=3
+httpx>=0.28

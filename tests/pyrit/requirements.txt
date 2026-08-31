@@ -1,0 +1,10 @@
+# PyRIT and its dependency tree conflict with the app's pinned requirements.txt
+# (transformers, scipy, datasets, pyodbc, av, ...). Install this in a SEPARATE
+# environment, never the app venv. See README.md.
+#
+#   python3 -m venv ~/venvs/pyrit
+#   ~/venvs/pyrit/bin/pip install -r tests/pyrit/requirements.txt
+#
+# Pinned to the version target.py was written against.
+pyrit==1.0.1
+httpx>=0.28
