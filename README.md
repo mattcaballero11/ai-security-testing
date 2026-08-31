@@ -6,7 +6,7 @@ An assessment dashboard for a self-owned LLM red-team lab, built to demonstrate 
 
 I do AI security testing professionally as part of my consulting work. Those engagements are covered by NDAs, so this repo contains no client data, findings, or engagement details. What it contains instead is a self-owned, non-confidential reconstruction of an assessment workflow: my own methodology, my own intentionally vulnerable target, and my own findings against it, run and documented so the work is visible and verifiable rather than just claimed.
 
-This is Project 1 of a three-project portfolio. Project 1 covers direct prompt injection, jailbreaking, hidden-context disclosure, and insecure output handling against a single local model with no tools and no agent loop. Indirect prompt injection and training data poisoning belong to Project 2. Excessive agency and agent/tool-use attacks belong to Project 3. Keeping that split clean instead of stretching one lab to cover everything is itself part of the methodology, not a limitation I'm hiding.
+This is Project 1 of a three-project portfolio. Project 1 covers direct prompt injection, jailbreaking, hidden-context disclosure, and improper output handling against a single local model with no tools and no agent loop. Indirect prompt injection and training data poisoning belong to Project 2. Excessive agency and agent/tool-use attacks belong to Project 3. Keeping that split clean instead of stretching one lab to cover everything is itself part of the methodology, not a limitation I'm hiding.
 
 ## Scope and authorization boundary
 
@@ -21,11 +21,11 @@ This table reflects the actual state of the repo, not a plan.
 
 | Scenario | What it tests | Status |
 |---|---|---|
-| P1-01 Direct prompt injection | Instruction override, role reassignment, delimiter injection, refusal suppression against a document-summarizing assistant | Run in both modes, canonical and rate. Finding written. |
-| P1-02 Jailbreak and guardrail bypass | Multi-turn crescendo escalation versus single-turn persona framing | Not built |
-| P1-03 Hidden context and secret disclosure | Direct, indirect, and format-shifted attempts to recover the system instruction and the canary | Run in both modes, canonical and rate. Finding written. |
-| P1-04 Improper output handling | Model output rendered unescaped at `/render`, and the same payload rejected by `/structured` | Not built |
-| P1-05 Guardrail regression suite | The four scenarios above as a promptfoo suite, run against both modes in one command | Not built |
+| P1-01 Direct prompt injection | Instruction override, role reassignment, delimiter injection, refusal suppression against a document-summarizing assistant | Run in both modes, canonical and rate. [Finding](findings/P1-01-direct-prompt-injection.md) written. |
+| P1-02 Jailbreak and guardrail bypass | Multi-turn crescendo escalation versus single-turn persona framing, against a synthetic restricted topic | Run in both modes, canonical and rate. [Finding](findings/P1-02-jailbreak.md) written. |
+| P1-03 Hidden context and secret disclosure | Direct, indirect, and format-shifted attempts to recover the system instruction and the canary | Run in both modes, canonical and rate. [Finding](findings/P1-03-hidden-context-disclosure.md) written. |
+| P1-04 Improper output handling | Model output rendered unescaped at `/render`, and the same payload rejected by `/structured` | Run in both modes, canonical and rate (`render_probe.py`). [Finding](findings/P1-04-output-handling.md) written. |
+| P1-05 Guardrail regression suite | The four scenarios above as a promptfoo suite, run against both modes in one command | Built and run (`tests/promptfoo/run.sh`, promptfoo 0.122.2). 2026-08-31 gate: baseline 5/5, hardened 5/5, `gate_pass` true. [Report](evidence/reports/regression-2026-08-31.md), [finding](findings/P1-05-regression.md), and CI workflow in `.github/workflows/`. |
 
 Nothing below this table describes something that exists yet unless it says so explicitly.
 
@@ -44,7 +44,7 @@ attack scripts / garak / pyrit / promptfoo / giskard
         Ollama, local, 3B instruct model
 ```
 
-Baseline mode is deliberately weak: the behavioral policy and the canary live only in the system instruction, user input is concatenated with no separation, and output is returned raw. Hardened mode layers input normalization, delimiter separation, context minimization, output-side canary redaction, contextual escaping, and rate limiting on top of the same code path. Hardened mode does not make the model injection-proof. It moves the failure from "the model was fooled and something broke" to "the model was fooled and nothing important broke." That is a deliberate framing choice for the findings, not a hedge, and it matches how OWASP frames layered LLM defense in the 2026 list.
+Baseline mode is deliberately weak: the behavioral policy and the canary live only in the system instruction, user input is concatenated with no separation, and output is returned raw. Hardened mode layers input normalization, delimiter separation, context minimization, output-side canary redaction, output-side restricted-content screening, contextual escaping, and rate limiting on top of the same code path. Hardened mode does not make the model injection-proof. It moves the failure from "the model was fooled and something broke" to "the model was fooled and nothing important broke." That is a deliberate framing choice for the findings, not a hedge, and it matches how OWASP frames layered LLM defense in the 2026 list.
 
 ## Measurement protocol
 
@@ -61,10 +61,10 @@ Ollama's determinism is close but not guaranteed across batch sizes. The seed re
 | Tool | Role | Status |
 |---|---|---|
 | garak | rest generator against `/chat`, probes selected for P1-01 and P1-03 | Run against baseline, both scenarios ([`tests/garak/RESULTS.md`](tests/garak/RESULTS.md)). Agrees with the custom runner on P1-01; found no true positives on P1-03. Hardened runs pending. |
-| PyRIT | custom target class against `/chat`, multi-turn orchestration for P1-02 | Not built |
-| promptfoo | http provider against `/chat`, the P1-05 regression gate | Not built |
-| Giskard | one scan pass against the local target, triangulation on P1-02 and P1-03 | Not built |
-| Custom Python (`scripts/`) | scenario runner, evidence stamping, results normalization across the four tools above, baseline-versus-hardened delta | `run_scenario.py`, `stamp_evidence.py`, `normalize_results.py` built. `compare_modes.py` pending. |
+| PyRIT | custom target class against `/chat`, multi-turn orchestration for P1-02 | Target class and scripted crescendo built and run in both modes (`tests/pyrit/`). The PyRIT-driven `CrescendoAttack` was also run end to end against baseline and ended in max-turns/failure, which is why the reported rate comes from a fixed ladder, not an LLM-driven attacker. See `references/tool-limitations.md`. |
+| promptfoo | http provider against `/chat`, `/render`, `/structured`; the P1-05 regression gate | Suite, mode-aware assertions, and one-command `run.sh` built and run (`tests/promptfoo/`, promptfoo 0.122.2, its own Node install). 2026-08-31: both modes green, `gate_pass` true. |
+| Giskard | one scan pass against the local target, triangulation on P1-02 | Wrapper built (`tests/giskard/`), v3 scan runs against the local model. Both timeboxed runs (baseline, hardened) came up partial: it is slow (~1 request per 90s, local judge), and the judge is the model under test, so verdicts are advisory. Kept as weak triangulation, not a measurement. See `references/tool-limitations.md`. |
+| Custom Python (`scripts/`) | scenario runner, `/render` sink probe, evidence stamping, results normalization across every tool above, baseline-versus-hardened delta | `run_scenario.py`, `render_probe.py`, `stamp_evidence.py`, `normalize_results.py`, `compare_modes.py` built. |
 
 If any of these does not run against the target, it gets recorded in `references/tool-limitations.md` with what was tried and why, not quietly dropped from this table.
 
@@ -90,9 +90,10 @@ Project 1 cites the LLM Top 10 only. The separate OWASP Top 10 for Agentic Appli
 - [`references/`](references/): framework editions and verification status, tool limitations as they're discovered, and the out-of-scope risk classes with the reasoning for why they stay out of scope.
 - [`app/`](app/): the local FastAPI target, both modes behind an env switch.
 - [`scenarios/`](scenarios/): per-scenario threat model, payload fixtures, and success criteria.
-- [`scripts/`](scripts/): the scenario runner, evidence stamping, and result normalization.
-- [`tests/`](tests/): tool configs and run notes.
-- [`evidence/`](evidence/) and [`findings/`](findings/): the raw normalized results with metadata headers, and the write-ups built from them.
+- [`scripts/`](scripts/): the scenario runner, the `/render` sink probe, evidence stamping, result normalization, and the baseline-versus-hardened delta.
+- [`tests/`](tests/): tool configs and run notes, including the [`tests/promptfoo/`](tests/promptfoo/) P1-05 regression gate.
+- [`.github/workflows/`](.github/workflows/): the P1-05 gate as a CI job (runs on PRs touching the target or the pinned model, plus nightly; blocks merge on a failed gate).
+- [`evidence/`](evidence/) and [`findings/`](findings/): the raw normalized results with metadata headers (`evidence/reports/` holds the versioned P1-05 regression envelopes), and the write-ups built from them.
 
 ## Quick start
 

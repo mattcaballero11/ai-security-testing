@@ -1,0 +1,11 @@
+{
+  "name": "p1-05-regression-suite",
+  "private": true,
+  "description": "Project 1 P1-05 guardrail regression suite (promptfoo)",
+  "scripts": {
+    "gate": "bash run.sh"
+  },
+  "devDependencies": {
+    "promptfoo": "0.122.2"
+  }
+}

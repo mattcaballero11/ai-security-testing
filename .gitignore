@@ -2,8 +2,8 @@
 .env
 logs/
 
-# Local working material, kept off the published repo by choice (2026-08-30).
-.notes/
+# Personal notes and local working material, kept off the published repo by choice.
+notes/
 
 # Python
 venv/
@@ -22,6 +22,7 @@ promptfoo-errors.log
 .giskard/
 garak_runs/
 tests/garak/garak_runs/
+tests/giskard/giskard_runs/
 *.report.html
 *.report.jsonl
 

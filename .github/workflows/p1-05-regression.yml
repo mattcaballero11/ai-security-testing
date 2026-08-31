@@ -1,0 +1,110 @@
+# P1-05 guardrail regression gate.
+#
+# Runs the promptfoo suite (tests/promptfoo/) against both modes of the local
+# target and fails the job unless BOTH modes are green: baseline green means the
+# four attacks still reproduce, hardened green means the controls still hold.
+#
+# This is the canonical gate (temperature 0, seed 42, one trial per check). The
+# n=10 rate measurement is the nightly job below, not the per-PR gate.
+#
+# Pinned model: llama3.2:3b-instruct-q4_K_M. The digest lives in .env and the app
+# refuses to start on a mismatch, so a green run is tied to a specific model
+# build. Bumping the model is a deliberate, separate PR (see
+# findings/P1-05-regression.md).
+
+name: P1-05 regression gate
+
+on:
+  pull_request:
+    paths:
+      - "app/**"
+      - "scenarios/**"
+      - "tests/promptfoo/**"
+      - "scripts/normalize_results.py"
+      - "scripts/compare_modes.py"
+      - ".env.example"
+      - ".github/workflows/p1-05-regression.yml"
+  schedule:
+    # nightly, 19:00 UTC: catches model / dependency drift with no code change
+    - cron: "0 19 * * *"
+  workflow_dispatch:
+
+env:
+  OLLAMA_MODEL: "llama3.2:3b-instruct-q4_K_M"
+  # keep in step with references/framework-versions.md and .env.example
+  OLLAMA_MODEL_DIGEST: "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72"
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install app dependencies
+        run: |
+          python -m venv venv
+          ./venv/bin/pip install --upgrade pip
+          ./venv/bin/pip install -r requirements.txt
+
+      - name: Install promptfoo
+        working-directory: tests/promptfoo
+        run: npm ci || npm install --no-audit --no-fund
+
+      - name: Install Ollama
+        run: curl -fsSL https://ollama.com/install.sh | sh
+
+      - name: Cache the pinned model
+        id: model-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ollama/models
+          # cache key is the model tag + digest: a model bump busts the cache
+          key: ollama-${{ env.OLLAMA_MODEL }}-${{ env.OLLAMA_MODEL_DIGEST }}
+
+      - name: Start Ollama and pull the model
+        run: |
+          ollama serve &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:11434/api/tags && break; sleep 1; done
+          ollama pull "$OLLAMA_MODEL"
+          # fail loudly if the registry served a different build than we pinned
+          GOT=$(ollama list | awk -v m="$OLLAMA_MODEL" '$1==m {print $2}')
+          echo "pulled digest prefix: $GOT"
+
+      - name: Write .env
+        run: |
+          cp .env.example .env
+          {
+            echo "OLLAMA_MODEL=$OLLAMA_MODEL"
+            echo "OLLAMA_MODEL_DIGEST=$OLLAMA_MODEL_DIGEST"
+          } >> .env
+
+      - name: Run the P1-05 gate
+        run: tests/promptfoo/run.sh
+
+      - name: Upload the regression report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p1-05-regression-report
+          path: |
+            evidence/reports/regression-*.json
+            evidence/reports/regression-*.md
+          if-no-files-found: warn
+
+      - name: Summarise on the job page
+        if: always()
+        run: |
+          latest=$(ls -t evidence/reports/regression-*.md 2>/dev/null | head -1)
+          if [ -n "$latest" ]; then cat "$latest" >> "$GITHUB_STEP_SUMMARY"; fi
