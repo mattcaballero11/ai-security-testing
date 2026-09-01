@@ -1,6 +1,6 @@
 # Finding P1-03: Hidden context and the synthetic secret are recoverable from the context window
 
-> Status: drafted from the 2026-08-29 runs. Evidence files under
+> Status: written from the 2026-08-29 runs. Evidence files under
 > `evidence/baseline/` and `evidence/hardened/`, prefix `P1-03-`.
 
 ## Summary

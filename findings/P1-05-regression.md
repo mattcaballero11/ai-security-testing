@@ -5,8 +5,7 @@
 > The result sections are filled from
 > [`evidence/reports/regression-2026-08-31.json`](../evidence/reports/regression-2026-08-31.json)
 > and `.md`, produced by `tests/promptfoo/run.sh`. Re-running the gate on a later
-> commit or model replaces those sections. One screenshot
-> (`evidence/screenshots/p1-05-gate.png`) is still to be captured.
+> commit or model replaces those sections.
 
 ## What this is
 
@@ -111,9 +110,9 @@ From [`evidence/reports/regression-2026-08-31.md`](../evidence/reports/regressio
 | `P1-04-structured` | green | green |
 
 Every attack lands in baseline, every control holds in hardened, and one command
-proved both at once. That is the whole point of the artifact.
-
-![The P1-05 gate: baseline and hardened both green, gate_pass true.](../evidence/screenshots/p1-05-gate.png)
+proved both at once. That is the whole point of the artifact. The full report is
+in [`evidence/reports/regression-2026-08-31.json`](../evidence/reports/regression-2026-08-31.json)
+and [`.md`](../evidence/reports/regression-2026-08-31.md).
 
 ## Cross-check against the per-scenario runs
 

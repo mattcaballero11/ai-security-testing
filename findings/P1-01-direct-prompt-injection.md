@@ -1,6 +1,6 @@
 # Finding P1-01: Direct prompt injection moves the model outside its policy
 
-> Status: drafted from the 2026-08-29 runs. Evidence files under
+> Status: written from the 2026-08-29 runs. Evidence files under
 > `evidence/baseline/` and `evidence/hardened/`, prefix `P1-01-`.
 
 ## Summary
