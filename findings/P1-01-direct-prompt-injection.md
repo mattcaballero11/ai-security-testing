@@ -236,8 +236,10 @@ control.
   here and the finding does not claim it.
 - **MITRE ATLAS**: LLM Prompt Injection, Direct (`AML.T0051.000`), the
   sub-technique of `AML.T0051` where the attacker supplies the malicious prompt
-  as a direct user of the LLM. Tactics: Initial Access, Persistence, Privilege
-  Escalation, Defense Evasion.
+  as a direct user of the LLM. Tactic: Execution. (Re-verified 2026-09-06
+  against the live ATLAS site and its machine-readable STIX export; the
+  4-tactic list previously recorded here was wrong. See
+  [`references/framework-versions.md`](../references/framework-versions.md).)
 
 Verified against the ATLAS dataset on 2026-08-30. See
 [`references/framework-versions.md`](../references/framework-versions.md).

@@ -36,23 +36,33 @@ Confirmed for this repo's citations: P1-01 maps to LLM01, P1-03 maps to LLM02 an
 
 ## MITRE ATLAS
 
-- Edition: continuously updated matrix, not versioned by edition number.
-- Accessed: 2026-08-30
-- Source: atlas.mitre.org (technique pages verified through the MISP-galaxy mirror of the ATLAS dataset; atlas.mitre.org technique deep-links were returning 404 to the fetch tool on the access date, so the matrix itself should be re-checked by hand before publishing)
-- Verified by me on: 2026-08-30
+- Edition: continuously updated matrix, not versioned by edition number; the site itself stamps each technique page with a monthly permalink (currently v2026.08) and a per-technique "Last Modified" date.
+- Accessed and re-verified: 2026-09-06
+- Source: atlas.mitre.org, cross-checked against the machine-readable STIX export at `github.com/mitre-atlas/atlas-navigator-data` (`dist/stix-atlas.json`), which is fetchable directly and is now the preferred verification method — it doesn't depend on the site's client-side routing the way a plain HTTP fetch of a technique deep-link does. atlas.mitre.org technique deep-links still return 404 to a non-JS fetch (confirmed again on the access date above); loading the site in a real browser and letting it client-route, or reading the STIX export, both work.
+- Verified by me on: 2026-09-06 (previous verification, 2026-08-30 via the MISP-galaxy mirror, is superseded — it had two errors, corrected below)
 
 Techniques cited in this repo:
 
 | ID | Name | Tactic(s) |
 |---|---|---|
-| AML.T0051 | LLM Prompt Injection | Initial Access, Persistence, Privilege Escalation, Defense Evasion |
+| AML.T0051 | LLM Prompt Injection | Execution |
 | AML.T0051.000 | LLM Prompt Injection: Direct | same as parent |
 | AML.T0051.001 | LLM Prompt Injection: Indirect | same as parent |
-| AML.T0054 | LLM Jailbreak | Privilege Escalation, Defense Evasion |
-| AML.T0056 | LLM Meta Prompt Extraction | Discovery, Exfiltration |
+| AML.T0051.002 | LLM Prompt Injection: Triggered | same as parent |
+| AML.T0054 | LLM Jailbreak | Defense Evasion, Privilege Escalation |
+| AML.T0056 | Extract LLM System Prompt | Exfiltration |
 | AML.T0057 | LLM Data Leakage | Exfiltration |
 
-P1-01 is AML.T0051.000 (Direct). P1-03 is AML.T0056 (Meta Prompt Extraction) for the system-instruction recovery and AML.T0057 (Data Leakage) for the canary, with AML.T0051.000 as the delivery technique. P1-02 is AML.T0054 (Jailbreak). A secondary source mentioned an AML.T0051.002 "Triggered" sub-technique; it is not in the MISP mirror of the dataset as of this date, so it is not cited here.
+P1-01 is AML.T0051.000 (Direct). P1-03 is AML.T0056 for the system-instruction recovery and AML.T0057 (LLM Data Leakage) for the canary, with AML.T0051.000 as the delivery technique. P1-02 is AML.T0054 (LLM Jailbreak).
+
+**Two corrections from the 2026-08-30 pass, found on re-verification:**
+
+1. **AML.T0051's tactic list was wrong.** It was recorded as "Initial Access, Persistence, Privilege Escalation, Defense Evasion" — that was a guess extrapolated from the technique's prose description, not read off the actual technique page, and it was wrong. The live page (and the STIX export) both give AML.T0051 exactly one tactic: **Execution**. Fixed in every finding that cited it (P1-01, P1-04).
+2. **AML.T0056 was renamed.** It is no longer "LLM Meta Prompt Extraction" — the current name is **"Extract LLM System Prompt"** (the mitigation text still uses "meta prompt extraction" as legacy wording, which is how the old name is traceable). Its tactic list also dropped from "Discovery, Exfiltration" to **just Exfiltration**. Fixed in P1-03.
+
+AML.T0051.002 "Triggered" is real and current (tactic: Execution, same as its parent) — the 2026-08-30 note that it "is not in the MISP mirror... so it is not cited here" was accurate about the mirror at the time but is now stale; it's listed above for completeness. It's not cited by name in any finding because none of this repo's scenarios are event-triggered injection.
+
+**Also checked and deliberately not cited:** AML.T0077 "LLM Response Rendering" (tactic: Exfiltration) looked like a possible fit for P1-04 on the name alone. Its actual definition is narrower and different: getting the LLM to emit a markdown/HTML image tag whose URL parameters carry private data to an attacker-controlled server, exfiltrated the moment the client renders it — a covert-channel technique, not "output rendered without escaping." P1-04 is the latter, so AML.T0051 (the injection chain) remains the closest fit and T0077 is not cited.
 
 ## NIST AI Risk Management Framework
 

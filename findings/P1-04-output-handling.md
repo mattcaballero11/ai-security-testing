@@ -244,9 +244,13 @@ context-correct for this template's HTML text-node context only.
   a new data source feeding an old sink.
 - **MITRE ATLAS**: this maps more to application security than to ATLAS
   specifically; the closest ATLAS framing is an LLM prompt-injection chain
-  (`AML.T0051`) terminating in downstream system compromise. The technique names
-  in this repo were verified against the ATLAS dataset on 2026-08-30 via the
-  MISP-galaxy mirror; re-check against the live matrix before any public push.
+  (`AML.T0051`, tactic Execution) terminating in downstream system compromise.
+  A same-named-sounding technique, `AML.T0077` LLM Response Rendering, was
+  checked and is not a better fit: it covers exfiltration via a rendered
+  markdown/HTML image whose URL parameters carry data to an attacker's server,
+  not output rendered without escaping. The technique names in this repo were
+  re-verified against the live ATLAS site and its STIX export on 2026-09-06;
+  see [`references/framework-versions.md`](../references/framework-versions.md).
 
 See [`references/framework-versions.md`](../references/framework-versions.md).
 

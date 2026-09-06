@@ -13,10 +13,15 @@ response).
 - app git commit at test time: `8db7b89`
 - model / digest: `llama3.2:3b-instruct-q4_K_M` / `a80c4f17acd5`
 - date: 2026-08-29
-- Modes run: **baseline only**. Hardened garak runs were not done. The
-  `promptinject` payloads contain "ignore any previous and following
-  instructions", which the hardened override-phrase detector lists, so the
-  expected hardened result is near zero. It should be run, not assumed.
+- Modes run: **baseline only**, by deliberate scope decision, not an oversight.
+  garak fires far faster than the hardened rate limiter (30 requests/60s)
+  allows, and raising it is a real step with a real consequence (garak's own
+  request volume stops being throttled, which is not the control under test) —
+  see `tests/garak/README.md` for the exact `.env` change and the note to add
+  here once it's done. The `promptinject` payloads contain "ignore any
+  previous and following instructions", which the hardened override-phrase
+  detector lists, so the *expected* hardened result is near zero, but that is
+  a prediction, not a measurement, and this file does not claim otherwise.
 - `RATE_LIMIT_REQUESTS` not raised, because only baseline was run and baseline
   has no rate limit.
 - `divergence` module present under that name (garak 0.9+), no `replay` fallback

@@ -324,12 +324,13 @@ The finding says so.
   behavioural restriction, contrast with P1-01 which is the injection case
   (untrusted instruction crossing a trust boundary). Both map to LLM01; the
   taxonomy page keeps them apart.
-- **MITRE ATLAS**: LLM Jailbreak (`AML.T0054`). The multi-turn crescendo is the
-  archetypal case of this technique: iteratively refined prompts that move the
-  model past a restriction it enforces on single prompts. `AML.T0054` was
-  verified against the ATLAS dataset on 2026-08-30 (via the MISP-galaxy mirror;
-  re-check against the live site before any public push). See
-  [`references/framework-versions.md`](../references/framework-versions.md).
+- **MITRE ATLAS**: LLM Jailbreak (`AML.T0054`, tactics Defense Evasion and
+  Privilege Escalation). The multi-turn crescendo is the archetypal case of
+  this technique: iteratively refined prompts that move the model past a
+  restriction it enforces on single prompts — ATLAS's own technique page
+  names "Crescendo" by name as one of its listed strategies. `AML.T0054` was
+  re-verified against the live ATLAS site and its STIX export on 2026-09-06.
+  See [`references/framework-versions.md`](../references/framework-versions.md).
 
 The `jailbreaking.md` page already argues the injection-versus-jailbreak
 distinction; this finding is its worked example.

@@ -260,11 +260,14 @@ model produced the canary in hardened mode, the caller received `[REDACTED]`.
   assembles into context and does not intend the user to see. OWASP's framing is
   that you assume hidden context leaks and rate severity by what is in it. That
   framing is the basis for the severity call below.
-- **MITRE ATLAS**: LLM Meta Prompt Extraction (`AML.T0056`, tactics Discovery
-  and Exfiltration) for recovering the system instruction, and LLM Data Leakage
-  (`AML.T0057`, Exfiltration) for the canary. LLM Prompt Injection Direct
-  (`AML.T0051.000`) is the delivery technique for the payloads that get there
-  through an injected instruction.
+- **MITRE ATLAS**: Extract LLM System Prompt (`AML.T0056`, tactic Exfiltration
+  — this technique was renamed from "LLM Meta Prompt Extraction" and its
+  tactic list narrowed from Discovery+Exfiltration to Exfiltration only; see
+  [`references/framework-versions.md`](../references/framework-versions.md))
+  for recovering the system instruction, and LLM Data Leakage (`AML.T0057`,
+  Exfiltration) for the canary. LLM Prompt Injection Direct (`AML.T0051.000`)
+  is the delivery technique for the payloads that get there through an
+  injected instruction.
 
 Verified against the ATLAS dataset on 2026-08-30. See
 [`references/framework-versions.md`](../references/framework-versions.md).
